@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import NewsItem from '../NewsItem'
+import NewsItem from './NewsItem'
 import Spinner from './Spinner';
 import PropTypes from 'prop-types'
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -37,16 +37,19 @@ export default class News extends Component {
     }
 
     async updateNews() {
+        this.props.setProgress(10);
         let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
         this.setState({ loading: true });
         fetch(url).then((res) => res.json())
             .then((json) => {
+                this.props.setProgress(50);
                 this.setState({
                     articles: json.articles,
                     loading: false,
                     totalResults: json.totalResults
                 });
             })
+        this.props.setProgress(100);
     }
     //for previous page 
     handlePrevPage = async () => {
@@ -64,7 +67,7 @@ export default class News extends Component {
 
     // fetches more data 
     fetchMoreData = async () => {
-        this.setState({ page: this.state.page + 1}) ; 
+        this.setState({ page: this.state.page + 1 });
         let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
         this.setState({ loading: true });
         fetch(url).then((res) => res.json())
@@ -89,9 +92,9 @@ export default class News extends Component {
                     hasMore={this.state.articles.length !== this.state.totalResults}
                     loader={<h3><Spinner /></h3>}
                 >
-                    
+
                     <div className="row my-3 container">
-                        {this.state.articles.map((element ,index) => {
+                        {this.state.articles.map((element, index) => {
                             return <div className="col-md-4" key={index}>
                                 <NewsItem title={element.title} description={element.description} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} />
                             </div>
